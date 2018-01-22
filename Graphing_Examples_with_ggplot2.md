@@ -11,6 +11,7 @@ January 21, 2018
     -   [Plotting Relative Frequency by Category](#plotting-relative-frequency-by-category)
     -   [Plotting Joint Distributions of 2 Categorical Variables](#plotting-joint-distributions-of-2-categorical-variables)
     -   [Plotting Conditional Distribution of 2 Categorical Variables](#plotting-conditional-distribution-of-2-categorical-variables)
+    -   [Make the plot Presentable](#make-the-plot-presentable)
     -   [Plots for many categories](#plots-for-many-categories)
 
 Introduction
@@ -25,10 +26,10 @@ The grammar of graphics philosophy is largely inspired by the book **Grammar of 
 
 [Rick Scavetta](https://twitter.com/rick_scavetta?lang=en) in his course [Data visualisation with ggplot2](https://www.datacamp.com/courses/data-visualization-with-ggplot2-1) provides a great outline of major ggplot grammatical components to consider when designing a statistical graph. The grammar of graphics is basically composed of 2 principles:
 
-1.  Graphics are distinct layers of **grammatical elements** (ex. the data, geometries). These are like the adjectives and nouns of a language.
+1.  Graphs are distinct layers of **grammatical elements**.The data and geometric shapes applied to them are like the nouns and adjectives of the grammar of graphics.
 2.  Useful plots are built around appropriate **aesthetic mappings**. These mappings are like the rules for assembling the graphical vocabulary into something meaningful.
 
-According to Scavetta, there are 7 grammatical elements. The first 3 are essential for any plot to render. The latter 4 are optional, but enable better fine tuning of the nuances of the plot.
+There are 7 grammatical elements. The first 3 are essential for any plot using `ggplot2` to render. The last 4 are optional, but enable important customization and tweaking of plots.
 
 <table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -188,41 +189,14 @@ cars %>%
         geom_bar(stat = "identity")
 ```
 
-Having mapped the data to some aesthetics and a bar geometric figure, some other things you might want to fidget like detailed aesthetics, coordinates, themes (these are to show how the grammatical elements combine together). These aren't necessarily good ways to do a plot, but examples of how you can refine it using the grammatical elements of `ggplot2`.
-
--   add a title
--   re-arrange bars in ascending or descending order
--   change the width of the bars
--   change the scale of the y-axis to count up to 20, by 5.
--   flip the x-axis scale to be at the top of the graph.
--   Remove the x-axis title label. The boss is strange, doesn't seem to want an axis title here.
--   change size of axis titles. Say the boss likes size 14 axis titles!
--   change the style of of axis labels to italic and size 12 tick mark labels!
--   Say the boss wants the x-axis tick labels to be in red.
--   flip the coordinates so the bars are horizontal
-
-``` r
-ggplot(cars, aes(x = forcats::fct_infreq(factor(cyl)))) + # change order of bars with fct_infreq from forcats. 
-    geom_bar(width = .5) + # default bar width = 0.9
-    labs(x = NULL,
-         title = "Car Frequency by Cylinder type") +
-    scale_y_continuous(limits = c(0, 20), breaks = seq(0, 20, 5)) +
-    scale_x_discrete(position = "top") +
-    theme(axis.title.y = element_text(size = 14)) +
-    theme(axis.text.y = element_text(face = "italic", size = 12)) +
-    theme(axis.text.x = element_text(face = "italic", size = 12, color = "darkred")) +
-    coord_flip()
-```
-
-![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-6-1.png)
-
 ### Plotting Relative Frequency by Category
 
-We'll digress from the above and continue to develop the original plot's aesthetics, let's loook at:
+To continue to develop the plot to describe the data, let's loook at:
 
 -   relative frequency of cylinders instead of nominal frequency
--   let's convert the y-axis scales to percent instead of proportion
+-   convert the y-axis scales to percent instead of proportion
 -   update the y-axis label
+-   shorten the width of the bars to reduce unnecessary ink
 
 ``` r
 ggplot(cars, aes(x = forcats::fct_infreq(factor(cyl)), 
@@ -234,7 +208,7 @@ ggplot(cars, aes(x = forcats::fct_infreq(factor(cyl)),
     scale_y_continuous(labels = scales::percent) # from scales library
 ```
 
-![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 The following code generates identical plot as above, but pre-processes the relative frequencies earlier in a new data frame outside of `ggplot2`. This coded is provided as an alternative, but neither way is better than the other. It's all a personal preference and shows some of the flexibility of the library's interface.
 
@@ -253,7 +227,7 @@ cars %>%
         scale_y_continuous(labels = scales::percent) 
 ```
 
-![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 ### Plotting Joint Distributions of 2 Categorical Variables
 
@@ -296,7 +270,7 @@ ggplot(cars, aes(x = forcats::fct_infreq(factor(cyl)),
     scale_y_continuous(labels = scales::percent) 
 ```
 
-![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 We have a vizualization of the joint distribution of the relative frequency cars by cylinder and transmission type. One problem with **stacking** the transmission types on top each other (the default) may be that it's hard to understand the % of manual transmission cars by cylinder (because they start above 0% position on y-axis). So a couple refinements to make:
 
@@ -311,12 +285,12 @@ ggplot(cars, aes(x = forcats::fct_infreq(factor(cyl)),
     labs(x = "Cylinders",
          y = "Percentage",
          fill = "Transmission Type", # changed the label of legend.
-         title = "Percentage of Cars by Cylinder and transmission type",
-         subtitle = "as a % of total cars") +
+         title = "% of Total Cars by Cylinder and transmission type",
+         subtitle = "joint probability distribution") +
     scale_y_continuous(labels = scales::percent) 
 ```
 
-![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-11-1.png) Note that I also changed the label of the legend in the code from its default to be more descriptive.
+![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-10-1.png) Note that I also changed the label of the legend in the code from its default to be more descriptive.
 
 The above effectively plots the [joint distribution](https://en.wikipedia.org/wiki/Joint_probability_distribution) of Cylinders vs. Transmission. It's the same representation as this table.
 
@@ -350,6 +324,8 @@ round(prop.table(table(cylinders = cars$cyl, transmission = cars$am), margin = 1
 
 We can convert these conditional probabilities above into a dataframe in a couple different ways, and then pass them into our ggplot. **Version1** converts a prop.table into a dataframe. **Version2** wrangles the data in `dplyr` first and passes the conditional frequencies into the plot.
 
+Note also that plot elements can be assigned to objects.
+
 ``` r
 # demonstration. Not used for plot. 
 version1 <- data.frame(prop.table(table(cars$cyl, cars$am), margin = 1), 2) %>%
@@ -378,23 +354,49 @@ version2
     6     8     1     2     0.1428571
 
 ``` r
-ggplot(version2, aes(x = factor(cyl), 
+plot <- ggplot(version2, aes(x = factor(cyl), 
                      y = relative_freq,
                      fill = factor(am))) + 
     geom_bar(stat = "identity", width = .5, position = "dodge") +
     labs(x = "Cylinders",
          y = "% of Cylinder",
          fill = "Transmission Type", # changed the label of legend.
-         title = "Conditional Probability of Transmission Type by Cylinders") +
+         title = "Probability of Transmission Type Conditioned by Cylinders")
+plot
+```
+
+![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-13-1.png)
+
+### Make the plot Presentable
+
+You may want to modify other aesthetics, coordinates, themes (these are to show how the grammatical elements combine together) to make the graph fit your needs. Here are a few examples of how you can refine your plot using some of the other grammatical elements of `ggplot2`.
+
+-   add labels of the nominal frequencies on top of each bar.
+-   change the scale of the y-axis to be percentage instead of proportion.
+-   change the scale of the y-axis to go from 0 - 90% by 10% tickmarks.
+-   change size of axis titles to be larger than defaults.
+-   change the style of of axis titles to be italic.
+-   change the size of the tick mark labels to be larger than defaults.
+
+``` r
+plot +
+    geom_text(aes(label = freq), 
+              position = position_dodge(width = 0.5), # adjusts the horizontal position of text.
+              stat= "identity", 
+              size = 3,
+              vjust = -0.5) +
     scale_y_continuous(labels = scales::percent, limits = c(0, .9), breaks = seq(0, .9, .1)) +
-    theme(axis.title.y = element_text(size = 14)) +
-    theme(axis.text.y = element_text(face = "italic", size = 10)) +
-    theme(axis.text.x = element_text(face = "italic", size = 12))
+    theme(axis.title.y = element_text(face = "italic", size = 14)) +
+    theme(axis.title.x = element_text(face = "italic", size = 14)) +
+    theme(axis.text.y = element_text(size = 12)) +
+    theme(axis.text.x = element_text(size = 12)) 
 ```
 
 ![](Graphing_Examples_with_ggplot2_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
-By wrangling and plotting conditional probabilities, we see a clear visual, somewhat linear relationship between cylinder type and transmission type for the cars in the dataset. The more cylinders there are in the car, the more likely the car was to have a manual transmission.
+Now that we have a final plot, the conditional probability distribution of transmission type by cylinder type lets us understand that when the car has an 8-cylinder engine, 85% of the time it's a manual transmission.
+
+By wrangling and plotting conditional probabilities, we see a clear visual, somewhat linear relationship between cylinder type and transmission type for the cars in the dataset. The more cylinders there are in the car, the more likely the car is to have a manual transmission.
 
 ### Plots for many categories
 
